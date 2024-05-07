@@ -1,38 +1,40 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
     <!-- Project information -->
     <groupId>com.arkflame</groupId>
-    <artifactId>ExamplePlugin</artifactId>
+    <artifactId>AuthMePremium</artifactId>
     <packaging>jar</packaging>
 
     <!-- Plugin Information -->
-    <name>ExamplePlugin</name>
-    <description>This plugin was made using the Spigot Boilerplate by ArkFlame Development</description>
+    <name>AuthMePremium</name>
+    <description>Premium authentication for the AuthMe ecosystem</description>
     <version>0.0.1</version>
-    <url>https://github.com/arkflame/Spigot-Boilerplate</url>
+    <url>https://github.com/arkflame/BungeeCord-Boilerplate</url>
 
     <properties>
         <author>ArkFlame Development</author>
-        <mainClass>com.arkflame.example.ExamplePlugin</mainClass>
+        <mainClass>com.arkflame.authmepremium.AuthMePremiumPlugin</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-   <!-- External repositories -->
+    <!-- External repositories -->
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
     </repositories>
 
     <!-- Dependencies imports -->
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+        <groupId>net.md-5</groupId>
+        <artifactId>bungeecord-proxy</artifactId>
+        <version>1.20-R0.2-SNAPSHOT</version>
+        <scope>provided</scope>
         </dependency>
     </dependencies>
 
