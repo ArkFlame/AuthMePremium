@@ -64,7 +64,6 @@ public class PreLoginListener implements Listener {
                                 notPremium.add(initialHandler.getName());
                             } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
                                     | SecurityException e) {
-                                // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         } else {
@@ -74,7 +73,6 @@ public class PreLoginListener implements Listener {
                                 finishMethod.invoke(initialHandler);
                             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
                                     | SecurityException e) {
-                                // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         }
@@ -85,7 +83,6 @@ public class PreLoginListener implements Listener {
                 doneField.setAccessible(true);
                 doneField.set(event, callback);
             } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

@@ -48,7 +48,6 @@ public class PremiumPacketHandler extends PacketHandler {
             this.bungee = BungeeCord.getInstance();
             this.ch = (ChannelWrapper) HandlerReflectionUtil.getFieldValue(oldHandler, "ch");
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -60,7 +59,6 @@ public class PremiumPacketHandler extends PacketHandler {
 
     @Override
     public void handle(EncryptionResponse encryptionResponse) throws Exception {
-        System.out.println("Handling encryption...");
         EncryptionRequest request = (EncryptionRequest) HandlerReflectionUtil.getFieldValue(oldHandler, "request");
         Preconditions.checkState( EncryptionUtil.check( loginRequest.getPublicKey(), encryptionResponse, request ), "Invalid verification" );
         SecretKey sharedKey = EncryptionUtil.getSecret(encryptionResponse, request);
@@ -114,10 +112,9 @@ public class PremiumPacketHandler extends PacketHandler {
                             Method finishMethod = InitialHandler.class.getDeclaredMethod("finish");
                             finishMethod.setAccessible(true);
                             finishMethod.invoke(oldHandler);
-                            System.out.println(oldHandler.getName() + " is premium!");
                             PreLoginListener.premium.add(oldHandler.getName());
+                            PreLoginListener.notPremium.remove(oldHandler.getName());
                         } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
 
