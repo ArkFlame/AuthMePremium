@@ -7,3 +7,5 @@ messages:
   clear_all_success: "&aSuccessfully cleared all player data."
   clear_player_success: "&aSuccessfully cleared data for player &e%player%&a."
   no_permission: "&cNo permission to use this command."
+  title: "&a&lAuthMe Premium"
+  subtitle: "&7You are correctly logged as premium."
