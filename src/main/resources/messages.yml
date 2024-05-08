@@ -6,3 +6,4 @@ messages:
   check_nonpremium: "&e%player% &ais not a premium player."
   clear_all_success: "&aSuccessfully cleared all player data."
   clear_player_success: "&aSuccessfully cleared data for player &e%player%&a."
+  no_permission: "&cNo permission to use this command."

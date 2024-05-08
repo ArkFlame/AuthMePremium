@@ -9,6 +9,7 @@ import net.md_5.bungee.config.Configuration;
 public class AuthMePremiumCommand extends Command {
     private final Configuration messages;
     private final DataProvider dataProvider;
+    private static final String MESSAGE_PREFIX = "messages.";
 
     public AuthMePremiumCommand(Configuration messages, DataProvider dataProvider) {
         super("authmepremium");
@@ -18,6 +19,11 @@ public class AuthMePremiumCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
+        if (sender.hasPermission("authmepremium.usage")) {
+            sender.sendMessage(messages.getString(MESSAGE_PREFIX + "no_permission"));
+            return;
+        }
+
         if (args.length == 0) {
             sendUsageMessage(sender);
             return;
@@ -32,9 +38,11 @@ public class AuthMePremiumCommand extends Command {
                     return;
                 }
                 String setPremiumPlayer = args[1];
-                boolean isPremium = Boolean.parseBoolean(args[2]);
-                dataProvider.setPremium(setPremiumPlayer, isPremium);
-                sender.sendMessage(messages.getString("setpremium_success").replace("%player%", setPremiumPlayer));
+                boolean status = Boolean.parseBoolean(args[2]);
+                dataProvider.setPremium(setPremiumPlayer, status);
+                sender.sendMessage(messages.getString(MESSAGE_PREFIX + "setpremium_success")
+                        .replace("%player%", setPremiumPlayer)
+                        .replace("%status%", String.valueOf(status)));
                 break;
             case "check":
                 if (args.length < 2) {
@@ -42,23 +50,26 @@ public class AuthMePremiumCommand extends Command {
                     return;
                 }
                 String checkPlayer = args[1];
-                boolean isPlayerPremium = dataProvider.getPremium(checkPlayer);
-                if (isPlayerPremium) {
-                    sender.sendMessage(messages.getString("check_premium").replace("%player%", checkPlayer));
+                boolean isPremium = dataProvider.getPremium(checkPlayer);
+                if (isPremium) {
+                    sender.sendMessage(messages.getString(MESSAGE_PREFIX + "check_premium")
+                            .replace("%player%", checkPlayer));
                 } else {
-                    sender.sendMessage(messages.getString("check_nonpremium").replace("%player%", checkPlayer));
+                    sender.sendMessage(messages.getString(MESSAGE_PREFIX + "check_nonpremium")
+                            .replace("%player%", checkPlayer));
                 }
                 break;
             case "clear":
                 if (args.length == 1) {
                     // Logic for clearing all player data
                     dataProvider.clear();
-                    sender.sendMessage(messages.getString("clear_all_success"));
+                    sender.sendMessage(messages.getString(MESSAGE_PREFIX + "clear_all_success"));
                 } else if (args.length == 2) {
                     String clearPlayer = args[1];
                     // Logic for clearing data of specific player
                     dataProvider.clear(clearPlayer);
-                    sender.sendMessage(messages.getString("clear_player_success").replace("%player%", clearPlayer));
+                    sender.sendMessage(messages.getString(MESSAGE_PREFIX + "clear_player_success")
+                            .replace("%player%", clearPlayer));
                 } else {
                     sendUsageMessage(sender);
                 }
@@ -70,6 +81,6 @@ public class AuthMePremiumCommand extends Command {
     }
 
     private void sendUsageMessage(CommandSender sender) {
-        sender.sendMessage(messages.getString("usage"));
+        sender.sendMessage(messages.getString(MESSAGE_PREFIX + "usage"));
     }
 }
