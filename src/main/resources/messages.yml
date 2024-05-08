@@ -1,2 +1,8 @@
 messages:
   logged_in: "&aYou are premium! UUID: {uuid}"
+  usage: "&6Usage: &e/authmepremium &7<setpremium/check/clear> <player> [true/false]"
+  setpremium_success: "&aSuccessfully set premium status for &e%player% &ato &e%status%&a."
+  check_premium: "&e%player% &ais a premium player."
+  check_nonpremium: "&e%player% &ais not a premium player."
+  clear_all_success: "&aSuccessfully cleared all player data."
+  clear_player_success: "&aSuccessfully cleared data for player &e%player%&a."
