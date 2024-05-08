@@ -4,6 +4,7 @@ import com.arkflame.authmepremium.managers.ConfigManager;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,5 +56,28 @@ public class YAMLProvider implements DataProvider {
 
     private void savePlayerConfig(String name, Configuration config) {
         configManager.save(plugin, "users/" + name + ".yml", config);
+    }
+
+    @Override
+    public void clear(String name) {
+        File file = new File(plugin.getDataFolder(), "users/" + name + ".yml");
+        if (file.exists()) {
+            file.delete();
+        }
+        playerConfigs.remove(name);
+    }
+
+    @Override
+    public void clear() {
+        playerConfigs.clear();
+        File folder = new File(plugin.getDataFolder(), "users");
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+        }
     }
 }

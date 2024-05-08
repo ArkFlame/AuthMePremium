@@ -46,10 +46,7 @@ public class MySQLProvider implements DataProvider {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, name);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getBoolean("premium");
-            }
+            return executeQueryAndGetPremium(statement);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -67,6 +64,38 @@ public class MySQLProvider implements DataProvider {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void clear(String name) {
+        String query = "DELETE FROM authme_premium_users WHERE name = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, name);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void clear() {
+        String query = "TRUNCATE TABLE authme_premium_users";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Boolean executeQueryAndGetPremium(PreparedStatement statement) throws SQLException {
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getBoolean("premium");
+            }
+        }
+        return null;
     }
 
     public void closeConnection() {

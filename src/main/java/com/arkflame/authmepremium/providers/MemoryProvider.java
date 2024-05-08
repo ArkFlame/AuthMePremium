@@ -19,4 +19,14 @@ public class MemoryProvider implements DataProvider {
     public void setPremium(String name, boolean premium) {
         premiumMap.put(name, premium);
     }
+
+    @Override
+    public void clear(String name) {
+        premiumMap.remove(name);
+    }
+
+    @Override
+    public void clear() {
+        premiumMap.clear();
+    }
 }
