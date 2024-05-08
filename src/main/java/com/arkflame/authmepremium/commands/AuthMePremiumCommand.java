@@ -19,7 +19,7 @@ public class AuthMePremiumCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (sender.hasPermission("authmepremium.usage")) {
+        if (!sender.hasPermission("authmepremium.usage")) {
             sender.sendMessage(messages.getString(MESSAGE_PREFIX + "no_permission"));
             return;
         }
