@@ -5,8 +5,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 import com.arkflame.authmepremium.AuthMePremiumPlugin;
-import com.arkflame.authmepremium.events.PremiumLoginEvent;
-import com.arkflame.authmepremium.listeners.PreLoginListener;
+import com.arkflame.authmepremium.events.PremiumPreLoginEvent;
 import com.arkflame.authmepremium.utils.HandlerReflectionUtil;
 
 import net.md_5.bungee.BungeeCord;
@@ -51,7 +50,7 @@ public class AuthCallback implements Callback<String> {
             updateHandlerWithLoginResult(obj);
             invokeFinishMethod();
             AuthMePremiumPlugin.getDataProvider().setPremium(oldHandler.getName(), true);
-            bungee.getPluginManager().callEvent(new PremiumLoginEvent(oldHandler));
+            bungee.getPluginManager().callEvent(new PremiumPreLoginEvent(oldHandler));
         } else {
             oldHandler.disconnect("Use another account");
         }

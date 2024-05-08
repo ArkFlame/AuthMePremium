@@ -2,7 +2,8 @@ package com.arkflame.authmepremium;
 
 import com.arkflame.authmepremium.listeners.PostLoginListener;
 import com.arkflame.authmepremium.listeners.PreLoginListener;
-import com.arkflame.authmepremium.listeners.PremiumLoginListener;
+import com.arkflame.authmepremium.listeners.PremiumPostLoginListener;
+import com.arkflame.authmepremium.listeners.PremiumPreLoginListener;
 import com.arkflame.authmepremium.managers.ConfigManager;
 import com.arkflame.authmepremium.providers.DataProvider;
 import com.arkflame.authmepremium.providers.MemoryProvider;
@@ -44,7 +45,8 @@ public class AuthMePremiumPlugin extends Plugin {
 
         pluginManager.registerListener(this, new PostLoginListener());
         pluginManager.registerListener(this, new PreLoginListener());
-        pluginManager.registerListener(this, new PremiumLoginListener());
+        pluginManager.registerListener(this, new PremiumPostLoginListener());
+        pluginManager.registerListener(this, new PremiumPreLoginListener());
     }
 
     private static AuthMePremiumPlugin instance;

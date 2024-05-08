@@ -8,10 +8,10 @@ import net.md_5.bungee.connection.InitialHandler;
  * It extends the BungeeCord Event class and encapsulates the InitialHandler instance.
  * Key functionalities include encapsulating the InitialHandler instance.
  */
-public class PremiumLoginEvent extends Event {
+public class PremiumPreLoginEvent extends Event {
     private InitialHandler initialHandler;
 
-    public PremiumLoginEvent(InitialHandler initialHandler) {
+    public PremiumPreLoginEvent(InitialHandler initialHandler) {
         this.initialHandler = initialHandler;
     }
     
