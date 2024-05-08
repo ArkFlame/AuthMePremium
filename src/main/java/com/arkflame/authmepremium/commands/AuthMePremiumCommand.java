@@ -1,7 +1,10 @@
 package com.arkflame.authmepremium.commands;
 
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
 import com.arkflame.authmepremium.providers.DataProvider;
 
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
@@ -32,50 +35,52 @@ public class AuthMePremiumCommand extends Command {
 
         String subCommand = args[0].toLowerCase();
 
-        switch (subCommand) {
-            case "setpremium":
-                if (args.length < 3) {
+        BungeeCord.getInstance().getScheduler().runAsync(AuthMePremiumPlugin.getInstance(), () -> {
+            switch (subCommand) {
+                case "setpremium":
+                    if (args.length < 3) {
+                        sendUsageMessage(sender);
+                        return;
+                    }
+                    String setPremiumPlayer = args[1];
+                    boolean status = Boolean.parseBoolean(args[2]);
+                    dataProvider.setPremium(setPremiumPlayer, status);
+                    sendMessage(sender, "setpremium_success",
+                            "%player%", setPremiumPlayer,
+                            "%status%", String.valueOf(status));
+                    break;
+                case "check":
+                    if (args.length < 2) {
+                        sendUsageMessage(sender);
+                        return;
+                    }
+                    String checkPlayer = args[1];
+                    Boolean isPremium = dataProvider.getPremium(checkPlayer);
+                    if (isPremium != null && isPremium) {
+                        sendMessage(sender, "check_premium", "%player%", checkPlayer);
+                    } else {
+                        sendMessage(sender, "check_nonpremium", "%player%", checkPlayer);
+                    }
+                    break;
+                case "clear":
+                    if (args.length == 1) {
+                        // Logic for clearing all player data
+                        dataProvider.clear();
+                        sendMessage(sender, "clear_all_success");
+                    } else if (args.length == 2) {
+                        String clearPlayer = args[1];
+                        // Logic for clearing data of specific player
+                        dataProvider.clear(clearPlayer);
+                        sendMessage(sender, "clear_player_success", "%player%", clearPlayer);
+                    } else {
+                        sendUsageMessage(sender);
+                    }
+                    break;
+                default:
                     sendUsageMessage(sender);
-                    return;
-                }
-                String setPremiumPlayer = args[1];
-                boolean status = Boolean.parseBoolean(args[2]);
-                dataProvider.setPremium(setPremiumPlayer, status);
-                sendMessage(sender, "setpremium_success",
-                        "%player%", setPremiumPlayer,
-                        "%status%", String.valueOf(status));
-                break;
-            case "check":
-                if (args.length < 2) {
-                    sendUsageMessage(sender);
-                    return;
-                }
-                String checkPlayer = args[1];
-                boolean isPremium = dataProvider.getPremium(checkPlayer);
-                if (isPremium) {
-                    sendMessage(sender, "check_premium", "%player%", checkPlayer);
-                } else {
-                    sendMessage(sender, "check_nonpremium", "%player%", checkPlayer);
-                }
-                break;
-            case "clear":
-                if (args.length == 1) {
-                    // Logic for clearing all player data
-                    dataProvider.clear();
-                    sendMessage(sender, "clear_all_success");
-                } else if (args.length == 2) {
-                    String clearPlayer = args[1];
-                    // Logic for clearing data of specific player
-                    dataProvider.clear(clearPlayer);
-                    sendMessage(sender, "clear_player_success", "%player%", clearPlayer);
-                } else {
-                    sendUsageMessage(sender);
-                }
-                break;
-            default:
-                sendUsageMessage(sender);
-                break;
-        }
+                    break;
+            }
+        });
     }
 
     private void sendUsageMessage(CommandSender sender) {
@@ -87,6 +92,6 @@ public class AuthMePremiumCommand extends Command {
         for (int i = 0; i < replacements.length; i += 2) {
             message = message.replace(replacements[i], replacements[i + 1]);
         }
-        sender.sendMessage(TextComponent.fromLegacyText(message));
+        sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
     }
 }
