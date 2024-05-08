@@ -28,24 +28,25 @@ public class PreLoginListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(PreLoginEvent event) {
         if (event.getConnection() instanceof InitialHandler) {
-            handleInitialHandler(event, (InitialHandler) event.getConnection());
+            InitialHandler initialHandler = (InitialHandler) event.getConnection();
+            try {
+                handleInitialHandler(event, initialHandler);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+                initialHandler.disconnect("Server-side error.");
+            }
         }
     }
 
-    private void handleInitialHandler(PreLoginEvent event, InitialHandler initialHandler) {
+    private void handleInitialHandler(PreLoginEvent event, InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
         initialHandler.setOnlineMode(true);
         ChannelWrapper ch = getChannel(initialHandler);
         setPremiumPacketHandler(ch, initialHandler);
         setPreLoginEventCallback(event, initialHandler);
     }
 
-    private ChannelWrapper getChannel(InitialHandler initialHandler) {
-        try {
-            return (ChannelWrapper) HandlerReflectionUtil.getFieldValue(initialHandler, "ch");
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private ChannelWrapper getChannel(InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
+        return (ChannelWrapper) HandlerReflectionUtil.getFieldValue(initialHandler, "ch");
     }
 
     private void setPremiumPacketHandler(ChannelWrapper ch, InitialHandler initialHandler) {
@@ -63,12 +64,17 @@ public class PreLoginListener implements Listener {
         return new Callback<PreLoginEvent>() {
             @Override
             public void done(PreLoginEvent result, Throwable error) {
-                handleCallbackResult(result, error, initialHandler);
+                try {
+                    handleCallbackResult(result, error, initialHandler);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                    initialHandler.disconnect("Server-side error.");
+                }
             }
         };
     }
 
-    private void handleCallbackResult(PreLoginEvent result, Throwable error, InitialHandler initialHandler) {
+    private void handleCallbackResult(PreLoginEvent result, Throwable error, InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
         if (result.isCancelled()) {
             handleCancellation(result, initialHandler);
         } else if (!isChannelClosing(initialHandler)) {
@@ -82,7 +88,7 @@ public class PreLoginListener implements Listener {
                 : TextComponent.fromLegacy(BungeeCord.getInstance().getTranslation("kick_message")));
     }
 
-    private boolean isChannelClosing(InitialHandler initialHandler) {
+    private boolean isChannelClosing(InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
         return getChannel(initialHandler).isClosing();
     }
 

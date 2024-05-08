@@ -1,5 +1,6 @@
 package com.arkflame.authmepremium.listeners;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,6 +8,7 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.logging.Level;
 
@@ -36,20 +38,14 @@ public class PremiumPacketHandler extends PacketHandler {
     private static final String MOJANG_AUTH_URL = System.getProperty("waterfall.auth.url",
             "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s%s");
 
-    private InitialHandler oldHandler;
-    private LoginRequest loginRequest;
-    private BungeeCord bungee;
-    private ChannelWrapper ch;
+    private final InitialHandler oldHandler;
+    private final ChannelWrapper ch;
+    private final BungeeCord bungee;
 
     public PremiumPacketHandler(InitialHandler oldHandler) {
-        try {
-            this.oldHandler = oldHandler;
-            this.loginRequest = oldHandler.getLoginRequest();
-            this.bungee = BungeeCord.getInstance();
-            this.ch = (ChannelWrapper) HandlerReflectionUtil.getFieldValue(oldHandler, "ch");
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            e.printStackTrace();
-        }
+        this.oldHandler = oldHandler;
+        this.ch = getChannel(oldHandler);
+        this.bungee = BungeeCord.getInstance();
     }
 
     @Override
@@ -59,78 +55,132 @@ public class PremiumPacketHandler extends PacketHandler {
 
     @Override
     public void handle(EncryptionResponse encryptionResponse) throws Exception {
-        EncryptionRequest request = (EncryptionRequest) HandlerReflectionUtil.getFieldValue(oldHandler, "request");
-        Preconditions.checkState( EncryptionUtil.check( loginRequest.getPublicKey(), encryptionResponse, request ), "Invalid verification" );
+        LoginRequest loginRequest = oldHandler.getLoginRequest();
+        EncryptionRequest request = getRequest();
+        Preconditions.checkState(EncryptionUtil.check(loginRequest.getPublicKey(), encryptionResponse, request),
+                "Invalid verification");
         SecretKey sharedKey = EncryptionUtil.getSecret(encryptionResponse, request);
-        // Waterfall start
-        if (sharedKey instanceof SecretKeySpec) {
-            if (sharedKey.getEncoded().length != 16) {
-                this.ch.close();
-                return;
-            }
+        if (!isValidSharedKey(sharedKey)) {
+            closeChannel();
+            return;
         }
-        // Waterfall end
+        addCipherHandlers(sharedKey);
+
+        String encName = URLEncoder.encode(oldHandler.getName(), "UTF-8");
+        String encodedHash = encodeHash(request.getServerId(), sharedKey.getEncoded());
+
+        String authURL = buildAuthURL(encName, encodedHash);
+
+        Callback<String> handler = createAuthHandler();
+        HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
+    }
+
+    private ChannelWrapper getChannel(InitialHandler initialHandler) {
+        try {
+            return (ChannelWrapper) HandlerReflectionUtil.getFieldValue(initialHandler, "ch");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private EncryptionRequest getRequest() {
+        try {
+            return (EncryptionRequest) HandlerReflectionUtil.getFieldValue(oldHandler, "request");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private boolean isValidSharedKey(SecretKey sharedKey) {
+        return sharedKey instanceof SecretKeySpec && sharedKey.getEncoded().length == 16;
+    }
+
+    private void addCipherHandlers(SecretKey sharedKey) throws GeneralSecurityException {
         BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
         ch.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
         BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
         ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+    }
 
-        String encName = URLEncoder.encode(oldHandler.getName(), "UTF-8");
-
-        MessageDigest sha = MessageDigest.getInstance("SHA-1");
-        for (byte[] bit : new byte[][] {
-                request.getServerId().getBytes("ISO_8859_1"), sharedKey.getEncoded(),
-                EncryptionUtil.keys.getPublic().getEncoded()
-        }) {
-            sha.update(bit);
+    private String encodeHash(String serverId, byte[] sharedKey) {
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            sha.update(serverId.getBytes("ISO_8859_1"));
+            sha.update(sharedKey);
+            sha.update(EncryptionUtil.keys.getPublic().getEncoded());
+            return URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
-        String encodedHash = URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
+    }
 
-        String preventProxy = (bungee.config.isPreventProxyConnections()
-                && getSocketAddress() instanceof InetSocketAddress)
-                        ? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
-                        : "";
-        String authURL = String.format(MOJANG_AUTH_URL, encName, encodedHash, preventProxy);
+    private String buildAuthURL(String encName, String encodedHash) throws UnsupportedEncodingException {
+        boolean preventProxy = bungee.config.isPreventProxyConnections()
+                && getSocketAddress() instanceof InetSocketAddress;
+        String preventProxyParam = preventProxy
+                ? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
+                : "";
+        return String.format(MOJANG_AUTH_URL, encName, encodedHash, preventProxyParam);
+    }
 
-        Callback<String> handler = new Callback<String>() {
+    private Callback<String> createAuthHandler() {
+        return new Callback<String>() {
             @Override
             public void done(String result, Throwable error) {
                 if (error == null) {
-                    LoginResult obj = bungee.gson.fromJson(result, LoginResult.class);
-                    if (obj != null && obj.getId() != null) {
-                        try {
-                            Field uniqueIdField = InitialHandler.class.getDeclaredField("uniqueId");
-                            uniqueIdField.setAccessible(true);
-
-                            // Set the uniqueId field if necessary
-                            if (true) {
-                                uniqueIdField.set(oldHandler, Util.getUUID(obj.getId()));
-                            }
-                            HandlerReflectionUtil.setFieldValue(oldHandler, "loginProfile", obj);
-                            HandlerReflectionUtil.setFieldValue(oldHandler, "name", obj.getName());
-
-                            Method finishMethod = InitialHandler.class.getDeclaredMethod("finish");
-                            finishMethod.setAccessible(true);
-                            finishMethod.invoke(oldHandler);
-                            PreLoginListener.premium.add(oldHandler.getName());
-                            PreLoginListener.notPremium.remove(oldHandler.getName());
-                        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                            e.printStackTrace();
-                        }
-
-                        return;
+                    try {
+                        handleAuthSuccess(result);
+                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
+                            | SecurityException | NoSuchFieldException e) {
+                        e.printStackTrace();
+                        oldHandler.disconnect("Server-side error");
                     }
-                    oldHandler.disconnect("Bro! You are offline :D");
                 } else {
-                    oldHandler.disconnect("Mojang failed xd");
-                    bungee.getLogger().log(Level.SEVERE,
-                            "Error authenticating " + oldHandler.getName() + " with minecraft.net",
-                            error);
+                    handleAuthFailure(error);
                 }
             }
         };
-        // thisState = State.FINISHING; // Waterfall - move earlier
-        HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
+    }
+
+    private void handleAuthSuccess(String result) throws IllegalAccessException, InvocationTargetException,
+            NoSuchMethodException, SecurityException, NoSuchFieldException {
+        LoginResult obj = bungee.gson.fromJson(result, LoginResult.class);
+        if (obj != null && obj.getId() != null) {
+            updateHandlerWithLoginResult(obj);
+            invokeFinishMethod();
+            PreLoginListener.premium.add(oldHandler.getName());
+            PreLoginListener.notPremium.remove(oldHandler.getName());
+        } else {
+            oldHandler.disconnect("Use another account");
+        }
+    }
+
+    private void handleAuthFailure(Throwable error) {
+        oldHandler.disconnect("Mojang failed");
+        bungee.getLogger().log(Level.SEVERE, "Error authenticating " + oldHandler.getName() + " with minecraft.net",
+                error);
+    }
+
+    private void updateHandlerWithLoginResult(LoginResult obj) throws NoSuchFieldException, IllegalAccessException {
+        Field uniqueIdField = InitialHandler.class.getDeclaredField("uniqueId");
+        uniqueIdField.setAccessible(true);
+
+        // Set the uniqueId field if necessary
+        if (true) { // Replace true with your condition
+            uniqueIdField.set(oldHandler, Util.getUUID(obj.getId()));
+        }
+        HandlerReflectionUtil.setFieldValue(oldHandler, "loginProfile", obj);
+        HandlerReflectionUtil.setFieldValue(oldHandler, "name", obj.getName());
+    }
+
+    private void invokeFinishMethod()
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        Method finishMethod = InitialHandler.class.getDeclaredMethod("finish");
+        finishMethod.setAccessible(true);
+        finishMethod.invoke(oldHandler);
     }
 
     private InetSocketAddress getAddress() {
@@ -139,5 +189,9 @@ public class PremiumPacketHandler extends PacketHandler {
 
     private SocketAddress getSocketAddress() {
         return oldHandler.getSocketAddress();
+    }
+
+    private void closeChannel() {
+        ch.close();
     }
 }
