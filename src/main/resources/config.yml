@@ -2,6 +2,9 @@
 # YAML, MYSQL, MEMORY
 provider: YAML
 
+# Target server for premium users
+target-server: "lobby"
+
 mysql:
   host: localhost
   port: 3306

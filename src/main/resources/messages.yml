@@ -1,4 +1,2 @@
 messages:
-  from-command: "&eHello world from Command."
-  from-listener: "&aHello world from Listener."
-  from-task: "&dHello world from Task."
+  logged_in: "&aYou are premium! UUID: {uuid}"

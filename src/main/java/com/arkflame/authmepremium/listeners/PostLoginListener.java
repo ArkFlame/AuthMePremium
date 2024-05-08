@@ -1,7 +1,5 @@
 package com.arkflame.authmepremium.listeners;
 
-import java.util.UUID;
-
 import com.arkflame.authmepremium.AuthMePremiumPlugin;
 import com.arkflame.authmepremium.events.PremiumPostLoginEvent;
 import com.arkflame.authmepremium.utils.HandlerReflectionUtil;
@@ -10,8 +8,6 @@ import fr.xephi.authmebungee.AuthMeBungee;
 import fr.xephi.authmebungee.data.AuthPlayer;
 import fr.xephi.authmebungee.services.AuthPlayerManager;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -39,29 +35,19 @@ public class PostLoginListener implements Listener {
 
         if (player != null) {
             String name = player.getName();
-
-            // Hook into AuthMeBungee
-            try {
-                hookAuthMeBungee(name);
-            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-            UUID uuid = player.getUniqueId();
             Boolean isPremium = AuthMePremiumPlugin.getDataProvider().getPremium(name);
-            boolean isReallyPremium = isPremium != null && isPremium;
-            String premiumMessage = isReallyPremium ? ChatColor.GREEN + "You are premium!"
-                    : ChatColor.RED + "You aren't premium!";
-            player.sendMessage(premiumMessage + " UUID: " + uuid);
 
-            if (isReallyPremium) {
-                ServerInfo serverInfo = BungeeCord.getInstance().getServerInfo("bw-1");
-                if (serverInfo != null) {
-                    player.connect(serverInfo);
+            if (isPremium != null && isPremium) {
+                // Hook into AuthMeBungee
+                try {
+                    hookAuthMeBungee(name);
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                        | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-            }
 
-            BungeeCord.getInstance().getPluginManager().callEvent(new PremiumPostLoginEvent(event));
+                BungeeCord.getInstance().getPluginManager().callEvent(new PremiumPostLoginEvent(event));
+            }
         }
     }
 }
