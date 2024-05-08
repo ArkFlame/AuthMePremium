@@ -24,6 +24,7 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.http.HttpClient;
 import net.md_5.bungee.jni.cipher.BungeeCipher;
 import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PacketHandler;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.netty.cipher.CipherDecoder;
@@ -58,6 +59,8 @@ public class PremiumPacketHandler extends PacketHandler {
 
     @Override
     public void handle(EncryptionResponse encryptionResponse) throws Exception {
+        setOldHandler(ch, oldHandler);
+
         LoginRequest loginRequest = oldHandler.getLoginRequest();
         EncryptionRequest request = getRequest();
         Preconditions.checkState(EncryptionUtil.check(loginRequest.getPublicKey(), encryptionResponse, request),
@@ -76,6 +79,12 @@ public class PremiumPacketHandler extends PacketHandler {
 
         Callback<String> handler = new AuthCallback(oldHandler, bungee);
         HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
+    }
+
+    private void setOldHandler(ChannelWrapper ch, InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
+        if (ch != null) {
+            ch.getHandle().pipeline().get(HandlerBoss.class).setHandler(initialHandler);
+        }
     }
 
     private ChannelWrapper getChannel(InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
