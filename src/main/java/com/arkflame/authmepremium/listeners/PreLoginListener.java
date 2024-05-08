@@ -1,8 +1,6 @@
 package com.arkflame.authmepremium.listeners;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
 
 import com.arkflame.authmepremium.callbacks.PostLoginCallback;
 import com.arkflame.authmepremium.handlers.PremiumPacketHandler;
