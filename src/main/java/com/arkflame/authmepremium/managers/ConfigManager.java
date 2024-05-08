@@ -16,7 +16,6 @@ public class ConfigManager {
         try {
             return ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -31,7 +30,10 @@ public class ConfigManager {
 
     public void save(Plugin plugin, String resource, Configuration config) {
         try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, new File(plugin.getDataFolder(), resource));
+            File file = new File(plugin.getDataFolder(), resource);
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
         } catch (IOException e) {
             e.printStackTrace();
         }

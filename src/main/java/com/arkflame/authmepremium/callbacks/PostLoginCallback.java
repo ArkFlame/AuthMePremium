@@ -8,7 +8,7 @@ import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.arkflame.authmepremium.listeners.PreLoginListener;
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
 import com.arkflame.authmepremium.utils.HandlerReflectionUtil;
 
 import net.md_5.bungee.BungeeCord;
@@ -19,7 +19,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 /**
  * This class implements the Callback interface for handling post-login events.
- * It performs actions based on the outcome of the pre-login event, such as sending an encryption request
+ * It performs actions based on the outcome of the pre-login event, such as
+ * sending an encryption request
  * for premium users or invoking the finish method for non-premium users.
  */
 public class PostLoginCallback implements Callback<PreLoginEvent> {
@@ -66,24 +67,20 @@ public class PostLoginCallback implements Callback<PreLoginEvent> {
 
     private void handleChannelNotClosing(InitialHandler initialHandler)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, NoSuchFieldException {
-        if (isPremium(initialHandler) || (initialHandler.isOnlineMode() && !isNotPremium(initialHandler))) {
-            handlePremium(initialHandler);
+        Boolean isPremium = AuthMePremiumPlugin.getDataProvider().getPremium(initialHandler.getName());
+
+        if (isPremium != null && isPremium || (isPremium == null && initialHandler.isOnlineMode())) {
+            handlePremium(initialHandler, isPremium);
         } else {
             handleNonPremium(initialHandler);
         }
     }
 
-    private boolean isPremium(InitialHandler initialHandler) {
-        return PreLoginListener.premium.contains(initialHandler.getName());
-    }
-
-    private boolean isNotPremium(InitialHandler initialHandler) {
-        return PreLoginListener.notPremium.contains(initialHandler.getName());
-    }
-
-    private void handlePremium(InitialHandler initialHandler) throws IllegalAccessException, NoSuchFieldException {
+    private void handlePremium(InitialHandler initialHandler, Boolean isPremium) throws IllegalAccessException, NoSuchFieldException {
         sendEncryptionRequest(initialHandler);
-        PreLoginListener.notPremium.add(initialHandler.getName());
+        if (isPremium == null) {
+            AuthMePremiumPlugin.getDataProvider().setPremium(initialHandler.getName(), false);
+        }
     }
 
     private void sendEncryptionRequest(InitialHandler initialHandler)
@@ -96,6 +93,7 @@ public class PostLoginCallback implements Callback<PreLoginEvent> {
     private void handleNonPremium(InitialHandler initialHandler)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         invokeFinishMethod(initialHandler);
+        initialHandler.setOnlineMode(false);
     }
 
     private void invokeFinishMethod(InitialHandler initialHandler)

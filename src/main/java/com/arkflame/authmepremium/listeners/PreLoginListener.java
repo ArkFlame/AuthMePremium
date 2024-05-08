@@ -24,9 +24,6 @@ import net.md_5.bungee.netty.HandlerBoss;
  * Key functionalities include setting premium packet handlers and defining event callbacks.
  */
 public class PreLoginListener implements Listener {
-    public static Collection<String> notPremium = new HashSet<>();
-    public static Collection<String> premium = new HashSet<>();
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(PreLoginEvent event) {
         if (event.getConnection() instanceof InitialHandler) {

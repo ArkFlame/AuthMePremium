@@ -2,6 +2,8 @@ package com.arkflame.authmepremium.listeners;
 
 import java.util.UUID;
 
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
+
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -18,7 +20,8 @@ public class PostLoginListener implements Listener {
         if (player != null) {
             String name = player.getName();
             UUID uuid = player.getUniqueId();
-            String premiumMessage = PreLoginListener.premium.contains(name) ? ChatColor.GREEN + "You are premium!" : ChatColor.RED +  "You aren't premium!";
+            Boolean isPremium = AuthMePremiumPlugin.getDataProvider().getPremium(name);
+            String premiumMessage = isPremium != null && isPremium ? ChatColor.GREEN + "You are premium!" : ChatColor.RED +  "You aren't premium!";
             player.sendMessage(premiumMessage + " UUID: " + uuid);
 
             ServerInfo serverInfo = BungeeCord.getInstance().getServerInfo("bw-1");

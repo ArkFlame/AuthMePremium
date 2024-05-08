@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
 import com.arkflame.authmepremium.events.PremiumLoginEvent;
 import com.arkflame.authmepremium.listeners.PreLoginListener;
 import com.arkflame.authmepremium.utils.HandlerReflectionUtil;
@@ -49,8 +50,7 @@ public class AuthCallback implements Callback<String> {
         if (obj != null && obj.getId() != null) {
             updateHandlerWithLoginResult(obj);
             invokeFinishMethod();
-            PreLoginListener.premium.add(oldHandler.getName());
-            PreLoginListener.notPremium.remove(oldHandler.getName());
+            AuthMePremiumPlugin.getDataProvider().setPremium(oldHandler.getName(), true);
             bungee.getPluginManager().callEvent(new PremiumLoginEvent(oldHandler));
         } else {
             oldHandler.disconnect("Use another account");
