@@ -1,1 +1,10 @@
-task-repeat-every: 10
+# Providers
+# YAML, MYSQL, MEMORY
+provider: YAML
+
+mysql:
+  host: localhost
+  port: 3306
+  database: authme_premium
+  username: root
+  password: password

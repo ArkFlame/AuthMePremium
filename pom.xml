@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <!-- Project information -->
     <groupId>com.arkflame</groupId>
     <artifactId>AuthMePremium</artifactId>
@@ -31,11 +31,22 @@
     <!-- Dependencies imports -->
     <dependencies>
         <dependency>
-        <groupId>net.md-5</groupId>
-        <artifactId>bungeecord-proxy</artifactId>
-        <version>1.20-R0.2-SNAPSHOT</version>
-        <scope>provided</scope>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-proxy</artifactId>
+            <version>1.20-R0.2-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>fr.xephi</groupId>
+            <artifactId>authmebungee</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.2.0</version>
+        </dependency>        
     </dependencies>
 
     <!-- Build settings -->
@@ -81,7 +92,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> 
+                        <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
