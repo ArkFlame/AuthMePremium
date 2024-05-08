@@ -92,8 +92,8 @@ public class PostLoginCallback implements Callback<PreLoginEvent> {
 
     private void handleNonPremium(InitialHandler initialHandler)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        invokeFinishMethod(initialHandler);
         initialHandler.setOnlineMode(false);
+        invokeFinishMethod(initialHandler);
     }
 
     private void invokeFinishMethod(InitialHandler initialHandler)
