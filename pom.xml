@@ -11,7 +11,7 @@
     <!-- Plugin Information -->
     <name>AuthMePremium</name>
     <description>Premium authentication for the AuthMe ecosystem</description>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <url>https://github.com/arkflame/BungeeCord-Boilerplate</url>
 
     <properties>
