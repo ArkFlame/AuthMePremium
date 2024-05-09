@@ -29,35 +29,17 @@ public class PremiumCommand extends Command {
             return;
         }
 
-        if (args.length == 0) {
-            sendUsageMessage(sender);
-            return;
-        }
-
         if (!(sender instanceof ProxiedPlayer)) {
             sendMessage(sender, "no_console");
             return;
         }
 
-        String subCommand = args[0].toLowerCase();
-
         BungeeCord.getInstance().getScheduler().runAsync(AuthMePremiumPlugin.getInstance(), () -> {
-            switch (subCommand) {
-                case "toggle":
-                    String name = sender.getName();
-                    boolean newStatus = !dataProvider.getPremium(name);
-                    dataProvider.setPremium(name, newStatus);
-                    sendMessage(sender, "premium_success", "{status}", String.valueOf(newStatus));
-                    break;
-                default:
-                    sendUsageMessage(sender);
-                    break;
-            }
+            String name = sender.getName();
+            boolean newStatus = !dataProvider.getPremium(name);
+            dataProvider.setPremium(name, newStatus);
+            sendMessage(sender, "premium_success", "{status}", String.valueOf(newStatus));
         });
-    }
-
-    private void sendUsageMessage(CommandSender sender) {
-        sendMessage(sender, "premium_usage");
     }
 
     private void sendMessage(CommandSender sender, String key, String... replacements) {
