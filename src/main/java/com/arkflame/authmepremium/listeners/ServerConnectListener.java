@@ -3,6 +3,7 @@ package com.arkflame.authmepremium.listeners;
 import com.arkflame.authmepremium.AuthMePremiumPlugin;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -21,7 +22,11 @@ public class ServerConnectListener implements Listener {
             if (isPremium != null && isPremium) {
                 String targetServer = determineTargetServer();
                 if (targetServer != null) {
-                    event.setTarget(BungeeCord.getInstance().getServerInfo(targetServer));
+                    ServerInfo serverInfo = BungeeCord.getInstance().getServerInfo(targetServer);
+
+                    if (serverInfo != null) {
+                        event.setTarget(serverInfo);
+                    }
                 }
             }
         }
