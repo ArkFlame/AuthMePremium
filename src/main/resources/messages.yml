@@ -1,6 +1,12 @@
 messages:
   logged_in: "&aYou are premium! UUID: {uuid}"
   authme_premium_usage: "&6Usage: &e/authmepremium &7<setpremium/setpremiumuuid/check/clear> <player> [true/false]"
+  authme_premium_no_permission: |-
+    &aAuthMe Premium&e v%version%&7 by &bArkFlame Development:
+    &7- Commands: 
+    &7  - &e/authmepremium <setpremium/setpremiumuuid/check/clear/reload> <player> [true/false]
+    &7  - &e/premium
+    &7  - &e/premiumuuid
   setpremium_success: "&aSuccessfully set premium status for &e%player% &ato &e%status%&a."
   setpremiumuuid_success: "&aSuccessfully set premium status for &e%player% &ato &e%status%&a."
   check_premium: "&e%player% &ais a premium player."
@@ -14,5 +20,7 @@ messages:
   title: "&a&lAuthMe Premium"
   subtitle: "&7You are correctly logged as premium."
 
-  premium_success: "&aYou have set premium mode to &e{status}"
-  premiumuuid_success: "&aYou have set premium uuid to &e{status}"
+  premium_success: "&aYou have set premium mode to &e%status%"
+  premiumuuid_success: "&aYou have set premium uuid to &e%status%"
+
+  reloaded: "&aThe plugin has been reloaded!"

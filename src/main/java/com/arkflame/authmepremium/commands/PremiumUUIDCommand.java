@@ -38,7 +38,7 @@ public class PremiumUUIDCommand extends Command {
             String name = sender.getName();
             boolean newStatus = !dataProvider.getPremiumUUID(name);
             dataProvider.setPremiumUUID(name, newStatus);
-            sendMessage(sender, "premiumuuid_success", "{status}", String.valueOf(newStatus));
+            sendMessage(sender, "premiumuuid_success", "%status%", String.valueOf(newStatus));
         });
     }
      

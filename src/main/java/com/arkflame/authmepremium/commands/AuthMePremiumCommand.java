@@ -24,7 +24,7 @@ public class AuthMePremiumCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("authmepremium.usage")) {
-            sendMessage(sender, "no_permission");
+            sendMessage(sender, "authme_premium_no_permission", "%version%", AuthMePremiumPlugin.getInstance().getDescription().getVersion());
             return;
         }
 
@@ -89,6 +89,12 @@ public class AuthMePremiumCommand extends Command {
                             "%player%", playerName,
                             "%status%", String.valueOf(premiumUUIDStatus));
                     break;
+                case "reload": {
+                    AuthMePremiumPlugin.getInstance().onDisable();
+                    AuthMePremiumPlugin.getInstance().onEnable();
+                    sendMessage(sender, "reloaded");
+                    break;
+                }
                 default:
                     sendUsageMessage(sender);
                     break;

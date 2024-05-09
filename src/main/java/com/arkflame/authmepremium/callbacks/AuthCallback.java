@@ -69,9 +69,11 @@ public class AuthCallback implements Callback<String> {
         // Only update if premium uuids are enabled
         // Otherwise, BungeeCord will set the offline uuid
         boolean alwaysOffline = AuthMePremiumPlugin.getConfig().getBoolean("always-offline");
-        Boolean premiumUUID = alwaysOffline || AuthMePremiumPlugin.getDataProvider().getPremiumUUID(oldHandler.getName());
-        if (premiumUUID == null || premiumUUID) {
-            HandlerReflectionUtil.setFieldValue(oldHandler, "uniqueId", Util.getUUID(obj.getId()));
+        if (!alwaysOffline) {
+            Boolean premiumUUID = AuthMePremiumPlugin.getDataProvider().getPremiumUUID(oldHandler.getName());
+            if (premiumUUID == null || premiumUUID) {
+                HandlerReflectionUtil.setFieldValue(oldHandler, "uniqueId", Util.getUUID(obj.getId()));
+            }
         }
 
         HandlerReflectionUtil.setFieldValue(oldHandler, "loginProfile", obj);

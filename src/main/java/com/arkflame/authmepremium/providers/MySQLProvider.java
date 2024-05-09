@@ -98,6 +98,8 @@ public class MySQLProvider implements DataProvider {
             if (resultSet.next()) {
                 return resultSet.getBoolean("premium_uuid");
             }
+        } catch (SQLException ex) {
+            /* Older data */
         }
         return null;
     }

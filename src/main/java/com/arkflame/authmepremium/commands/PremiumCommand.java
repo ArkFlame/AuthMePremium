@@ -38,7 +38,7 @@ public class PremiumCommand extends Command {
             String name = sender.getName();
             boolean newStatus = !dataProvider.getPremium(name);
             dataProvider.setPremium(name, newStatus);
-            sendMessage(sender, "premium_success", "{status}", String.valueOf(newStatus));
+            sendMessage(sender, "premium_success", "%status%", String.valueOf(newStatus));
         });
     }
 
