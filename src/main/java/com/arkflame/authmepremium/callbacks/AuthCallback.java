@@ -15,9 +15,12 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.connection.LoginResult;
 
 /**
- * This class implements the Callback interface for handling authentication callbacks.
- * It performs actions based on the result of the authentication request, such as updating the handler
- * with login information, invoking the finish method, and firing a PremiumLoginEvent for premium users.
+ * This class implements the Callback interface for handling authentication
+ * callbacks.
+ * It performs actions based on the result of the authentication request, such
+ * as updating the handler
+ * with login information, invoking the finish method, and firing a
+ * PremiumLoginEvent for premium users.
  */
 public class AuthCallback implements Callback<String> {
     private InitialHandler oldHandler;
@@ -63,7 +66,14 @@ public class AuthCallback implements Callback<String> {
     }
 
     private void updateHandlerWithLoginResult(LoginResult obj) throws NoSuchFieldException, IllegalAccessException {
-        HandlerReflectionUtil.setFieldValue(oldHandler, "uniqueId", Util.getUUID(obj.getId()));
+        // Only update if premium uuids are enabled
+        // Otherwise, BungeeCord will set the offline uuid
+        boolean alwaysOffline = AuthMePremiumPlugin.getConfig().getBoolean("always-offline");
+        Boolean premiumUUID = alwaysOffline || AuthMePremiumPlugin.getDataProvider().getPremiumUUID(oldHandler.getName());
+        if (premiumUUID == null || premiumUUID) {
+            HandlerReflectionUtil.setFieldValue(oldHandler, "uniqueId", Util.getUUID(obj.getId()));
+        }
+
         HandlerReflectionUtil.setFieldValue(oldHandler, "loginProfile", obj);
         HandlerReflectionUtil.setFieldValue(oldHandler, "name", obj.getName());
     }

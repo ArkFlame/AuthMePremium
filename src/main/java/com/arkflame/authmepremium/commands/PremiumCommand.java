@@ -1,0 +1,70 @@
+package com.arkflame.authmepremium.commands;
+
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
+import com.arkflame.authmepremium.providers.DataProvider;
+
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.config.Configuration;
+
+public class PremiumCommand extends Command {
+    private final Configuration messages;
+    private final DataProvider dataProvider;
+    private static final String MESSAGE_PREFIX = "messages.";
+
+    public PremiumCommand(Configuration messages, DataProvider dataProvider) {
+        super("premium");
+        this.messages = messages;
+        this.dataProvider = dataProvider;
+    }
+
+    @Override
+    public void execute(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("authmepremium.premium")) {
+            sendMessage(sender, "no_permission");
+            return;
+        }
+
+        if (args.length == 0) {
+            sendUsageMessage(sender);
+            return;
+        }
+
+        if (!(sender instanceof ProxiedPlayer)) {
+            sendMessage(sender, "no_console");
+            return;
+        }
+
+        String subCommand = args[0].toLowerCase();
+
+        BungeeCord.getInstance().getScheduler().runAsync(AuthMePremiumPlugin.getInstance(), () -> {
+            switch (subCommand) {
+                case "toggle":
+                    String name = sender.getName();
+                    boolean newStatus = !dataProvider.getPremium(name);
+                    dataProvider.setPremium(name, newStatus);
+                    sendMessage(sender, "premium_success", "{status}", String.valueOf(newStatus));
+                    break;
+                default:
+                    sendUsageMessage(sender);
+                    break;
+            }
+        });
+    }
+
+    private void sendUsageMessage(CommandSender sender) {
+        sendMessage(sender, "premium_usage");
+    }
+
+    private void sendMessage(CommandSender sender, String key, String... replacements) {
+        String message = messages.getString(MESSAGE_PREFIX + key);
+        for (int i = 0; i < replacements.length; i += 2) {
+            message = message.replace(replacements[i], replacements[i + 1]);
+        }
+        sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
+    }
+}

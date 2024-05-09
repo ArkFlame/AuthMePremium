@@ -1,6 +1,8 @@
 package com.arkflame.authmepremium;
 
 import com.arkflame.authmepremium.commands.AuthMePremiumCommand;
+import com.arkflame.authmepremium.commands.PremiumCommand;
+import com.arkflame.authmepremium.commands.PremiumUUIDCommand;
 import com.arkflame.authmepremium.listeners.PostLoginListener;
 import com.arkflame.authmepremium.listeners.PreLoginListener;
 import com.arkflame.authmepremium.listeners.PremiumPostLoginListener;
@@ -80,5 +82,7 @@ public class AuthMePremiumPlugin extends Plugin {
         pluginManager.registerListener(this, new ServerConnectListener());
 
         pluginManager.registerCommand(this, new AuthMePremiumCommand(messages, dataProvider));
+        pluginManager.registerCommand(this, new PremiumCommand(messages, dataProvider));
+        pluginManager.registerCommand(this, new PremiumUUIDCommand(messages, dataProvider));
     }
 }

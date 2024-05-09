@@ -46,6 +46,26 @@ public class YAMLProvider implements DataProvider {
         return playerConfigs.get(name);
     }
 
+    @Override
+    public Boolean getPremiumUUID(String name) {
+        if (!playerConfigs.containsKey(name)) {
+            loadPlayerConfig(name);
+        }
+        Configuration config = playerConfigs.get(name);
+        if (config.contains("premium_uuid")) {
+            return config.getBoolean("premium_uuid", false);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void setPremiumUUID(String name, boolean premium) {
+        Configuration config = getPlayerConfig(name);
+        config.set("premium_uuid", premium);
+        savePlayerConfig(name, config);
+    }
+
     private void loadPlayerConfig(String name) {
         Configuration config = configManager.load(plugin, "users/" + name + ".yml");
         if (config == null) {

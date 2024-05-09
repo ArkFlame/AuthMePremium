@@ -5,9 +5,11 @@ import java.util.Map;
 
 public class MemoryProvider implements DataProvider {
     private final Map<String, Boolean> premiumMap;
+    private final Map<String, Boolean> premiumUUIDMap;
 
     public MemoryProvider() {
         this.premiumMap = new HashMap<>();
+        this.premiumUUIDMap = new HashMap<>();
     }
 
     @Override
@@ -23,6 +25,16 @@ public class MemoryProvider implements DataProvider {
     @Override
     public void clear(String name) {
         premiumMap.remove(name);
+    }
+
+    @Override
+    public Boolean getPremiumUUID(String name) {
+        return premiumUUIDMap.get(name);
+    }
+
+    @Override
+    public void setPremiumUUID(String name, boolean premiumUUID) {
+        premiumUUIDMap.put(name, premiumUUID);
     }
 
     @Override

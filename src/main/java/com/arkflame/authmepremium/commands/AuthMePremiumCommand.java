@@ -76,6 +76,19 @@ public class AuthMePremiumCommand extends Command {
                         sendUsageMessage(sender);
                     }
                     break;
+                case "setpremiumuuid": // New sub-command to set premium_uuid
+                    if (args.length < 3) {
+                        sendUsageMessage(sender);
+                        return;
+                    }
+                    String playerName = args[1];
+                    boolean premiumUUIDStatus = Boolean.parseBoolean(args[2]);
+                    // Logic to update premium_uuid status in dataProvider
+                    dataProvider.setPremiumUUID(playerName, premiumUUIDStatus);
+                    sendMessage(sender, "setpremiumuuid_success",
+                            "%player%", playerName,
+                            "%status%", String.valueOf(premiumUUIDStatus));
+                    break;
                 default:
                     sendUsageMessage(sender);
                     break;
@@ -84,7 +97,7 @@ public class AuthMePremiumCommand extends Command {
     }
 
     private void sendUsageMessage(CommandSender sender) {
-        sendMessage(sender, "usage");
+        sendMessage(sender, "authme_premium_usage");
     }
 
     private void sendMessage(CommandSender sender, String key, String... replacements) {

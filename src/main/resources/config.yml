@@ -5,6 +5,10 @@ provider: YAML
 # Target server for premium users
 target-server: "lobby"
 
+# Always use offline uuids
+# Remember players can toggle this with /premiumuuid
+always-offline: false
+
 mysql:
   host: localhost
   port: 3306
