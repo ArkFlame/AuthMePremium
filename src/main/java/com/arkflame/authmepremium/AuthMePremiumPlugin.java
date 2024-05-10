@@ -85,4 +85,10 @@ public class AuthMePremiumPlugin extends Plugin {
         pluginManager.registerCommand(this, new PremiumCommand(messages, dataProvider));
         pluginManager.registerCommand(this, new PremiumUUIDCommand(messages, dataProvider));
     }
+
+    @Override
+    public void onDisable() {
+        getProxy().getPluginManager().unregisterListeners(this);
+        getProxy().getPluginManager().unregisterCommands(this);
+    }
 }
