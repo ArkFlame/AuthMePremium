@@ -1,14 +1,31 @@
-# Providers
-# YAML, MYSQL, MEMORY
+#
+# Providers for database
+# YAML - Configuration system, server-specific, slow. (DEFAULT)
+# MYSQL - Database system, high-performance. (RECOMMENDED)
+# MEMORY - Store data on memory, high-performance. (CLEARS ON RESTART)
+#
 provider: YAML
 
-# Target server for premium users
+#
+# Premium players will be moved to target server when joining.
+#
+# Make sure this is a server that does not have authme installed
+# this way, premium players can skip logging in.
+#
 target-server: "lobby"
 
-# Always use offline uuids
+#
+# Always use offline uuids instead of Mojang ones
 # Remember players can toggle this with /premiumuuid
+#
+# IMPORTANT: By default, if players are already registered in LuckPerms (offline)
+# it will throw errors with premium uuids. Configure this to your likes.
+#
 always-offline: false
 
+#
+# Database information for MySQL
+#
 mysql:
   host: localhost
   port: 3306
