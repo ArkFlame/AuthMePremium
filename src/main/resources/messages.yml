@@ -1,5 +1,11 @@
 messages:
+  # Chat shown to premium players when they login
   logged_in: "&aYou are premium! UUID: {uuid}"
+
+  # Title shown to premium players when they login
+  title: "&a&lAuthMe Premium"
+  subtitle: "&7You are correctly logged as premium."
+
   authme_premium_usage: "&6Usage: &e/authmepremium &7<setpremium/setpremiumuuid/check/clear> <player> [true/false]"
   authme_premium_no_permission: |-
     &aAuthMe Premium&e v%version%&7 by &bArkFlame Development:
@@ -16,9 +22,6 @@ messages:
 
   no_permission: "&cNo permission to use this command."
   no_console: "&cYou cannot use this command from the console."
-
-  title: "&a&lAuthMe Premium"
-  subtitle: "&7You are correctly logged as premium."
 
   premium_success: "&aYou have set premium mode to &e%status%"
   premiumuuid_success: "&aYou have set premium uuid to &e%status%"

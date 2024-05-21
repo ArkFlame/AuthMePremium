@@ -69,8 +69,7 @@ public class AuthMePremiumPlugin extends Plugin {
                 setDataProvider(new MemoryProvider());
                 break;
             default:
-                // Handle default case, maybe log an error or throw an exception
-                break;
+                throw new RuntimeException("You entered an invalid provider: " + provider);
         }
 
         PluginManager pluginManager = getProxy().getPluginManager();
