@@ -55,7 +55,7 @@ public class AuthMePremiumPlugin extends Plugin {
         ConfigManager configManager = new ConfigManager();
         setConfig(configManager.loadDefault(this, "config.yml"));
         Configuration messages = configManager.loadDefault(this, "messages.yml");
-        String provider = config.getString("provider");
+        String provider = config.getString("provider") == null ? "" : config.getString("provider").toUpperCase();
 
         switch (provider) {
             case "YAML":
