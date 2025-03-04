@@ -1,6 +1,7 @@
 package com.arkflame.authmepremium.handlers;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -99,11 +100,41 @@ public class PremiumPacketHandler extends PacketHandler {
         return sharedKey instanceof SecretKeySpec && sharedKey.getEncoded().length == 16;
     }
 
+    String framePrependerName = null;
+
     private void addCipherHandlers(SecretKey sharedKey) throws GeneralSecurityException {
         BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
         ch.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
+    
         BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
-        ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+    
+        // Use reflection to find the correct frame prepender field
+        if (framePrependerName == null) {
+            framePrependerName = getFramePrependerName(PipelineUtils.class);
+        }
+    
+        if (framePrependerName != null) {
+            ch.addBefore(framePrependerName, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+        } else {
+            throw new IllegalStateException("Frame prepender field not found in PipelineUtils class.");
+        }
+    }
+    
+    private String getFramePrependerName(Class<?> clazz) {
+        // Possible names for the frame prepender field
+        String[] possibleNames = {"FRAME_PREPENDER_AND_COMPRESS", "FRAME_PREPENDER"};
+    
+        for (String name : possibleNames) {
+            try {
+                clazz.getField(name);
+                // If the field is found, return its name
+                return name;
+            } catch (NoSuchFieldException e) {
+                // Field not found, continue to the next possible name
+            }
+        }
+        // Return null if none of the possible names are found
+        return null;
     }
 
     private String encodeHash(String serverId, byte[] sharedKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
