@@ -35,9 +35,11 @@ import net.md_5.bungee.protocol.packet.EncryptionResponse;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 
 /**
- * This class extends PacketHandler and is responsible for handling premium packet-related operations.
+ * This class extends PacketHandler and is responsible for handling premium
+ * packet-related operations.
  * It manages encryption, decryption, and authentication requests.
- * Key functionalities include constructing authentication URLs, adding cipher handlers, and closing channels.
+ * Key functionalities include constructing authentication URLs, adding cipher
+ * handlers, and closing channels.
  */
 public class PremiumPacketHandler extends PacketHandler {
     private static final String MOJANG_AUTH_URL = System.getProperty("waterfall.auth.url",
@@ -82,13 +84,15 @@ public class PremiumPacketHandler extends PacketHandler {
         HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
     }
 
-    private void setOldHandler(ChannelWrapper ch, InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
+    private void setOldHandler(ChannelWrapper ch, InitialHandler initialHandler)
+            throws NoSuchFieldException, IllegalAccessException {
         if (ch != null) {
             ch.getHandle().pipeline().get(HandlerBoss.class).setHandler(initialHandler);
         }
     }
 
-    private ChannelWrapper getChannel(InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
+    private ChannelWrapper getChannel(InitialHandler initialHandler)
+            throws NoSuchFieldException, IllegalAccessException {
         return (ChannelWrapper) HandlerReflectionUtil.getFieldValue(initialHandler, "ch");
     }
 
@@ -105,31 +109,33 @@ public class PremiumPacketHandler extends PacketHandler {
     private void addCipherHandlers(SecretKey sharedKey) throws GeneralSecurityException {
         BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
         ch.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
-    
+
         BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
-    
+
         // Use reflection to find the correct frame prepender field
         if (framePrependerName == null) {
             framePrependerName = getFramePrependerName(PipelineUtils.class);
         }
-    
+
         if (framePrependerName != null) {
             ch.addBefore(framePrependerName, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
         } else {
             throw new IllegalStateException("Frame prepender field not found in PipelineUtils class.");
         }
     }
-    
+
     private String getFramePrependerName(Class<?> clazz) {
         // Possible names for the frame prepender field
-        String[] possibleNames = {"FRAME_PREPENDER_AND_COMPRESS", "FRAME_PREPENDER"};
-    
+        String[] possibleNames = { "FRAME_PREPENDER_AND_COMPRESS", "FRAME_PREPENDER" };
+
         for (String name : possibleNames) {
             try {
-                clazz.getField(name);
+                Field field = clazz.getDeclaredField(name);
                 // If the field is found, return its name
-                return name;
-            } catch (NoSuchFieldException e) {
+                if (field.getType() == String.class) {
+                    return (String) field.get(null);
+                }
+            } catch (Exception e) {
                 // Field not found, continue to the next possible name
             }
         }
@@ -137,12 +143,13 @@ public class PremiumPacketHandler extends PacketHandler {
         return null;
     }
 
-    private String encodeHash(String serverId, byte[] sharedKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            sha.update(serverId.getBytes(StandardCharsets.ISO_8859_1));
-            sha.update(sharedKey);
-            sha.update(EncryptionUtil.keys.getPublic().getEncoded());
-            return URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
+    private String encodeHash(String serverId, byte[] sharedKey)
+            throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+        sha.update(serverId.getBytes(StandardCharsets.ISO_8859_1));
+        sha.update(sharedKey);
+        sha.update(EncryptionUtil.keys.getPublic().getEncoded());
+        return URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
     }
 
     private String buildAuthURL(String encName, String encodedHash) throws UnsupportedEncodingException {
