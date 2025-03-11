@@ -30,9 +30,9 @@ public class MySQLProvider implements DataProvider {
 
     private void createTable() {
         String query = "CREATE TABLE IF NOT EXISTS authme_premium_users (" +
-                "name VARCHAR(50) NOT NULL PRIMARY KEY," +
-                "premium BOOLEAN NOT NULL," +
-                "premium_uuid BOOLEAN NOT NULL)";
+            "name VARCHAR(50) NOT NULL PRIMARY KEY," +
+            "premium BOOLEAN NOT NULL DEFAULT FALSE," +
+            "premium_uuid BOOLEAN NOT NULL DEFAULT FALSE)";
         try (Connection connection = dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
             statement.executeUpdate();
