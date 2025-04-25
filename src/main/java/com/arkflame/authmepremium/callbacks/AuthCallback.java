@@ -48,7 +48,7 @@ public class AuthCallback implements Callback<String> {
 
     private void handleAuthSuccess(String result) throws IllegalAccessException, InvocationTargetException,
             NoSuchMethodException, SecurityException, NoSuchFieldException {
-        LoginResult obj = bungee.gson.fromJson(result, LoginResult.class);
+        LoginResult obj = LoginResult.GSON.fromJson(result, LoginResult.class);
         if (obj != null && obj.getId() != null) {
             updateHandlerWithLoginResult(obj);
             invokeFinishMethod();
