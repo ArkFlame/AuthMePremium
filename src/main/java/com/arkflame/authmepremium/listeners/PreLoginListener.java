@@ -2,8 +2,11 @@ package com.arkflame.authmepremium.listeners;
 
 import java.lang.reflect.Field;
 
+import com.arkflame.authmepremium.AuthMePremiumPlugin;
 import com.arkflame.authmepremium.callbacks.PostLoginCallback;
 import com.arkflame.authmepremium.handlers.PremiumPacketHandler;
+import com.arkflame.authmepremium.hook.FloodgateHook;
+import com.arkflame.authmepremium.utils.AuthMeBungeeHook;
 import com.arkflame.authmepremium.utils.HandlerReflectionUtil;
 
 import net.md_5.bungee.api.Callback;
@@ -18,8 +21,10 @@ import net.md_5.bungee.netty.HandlerBoss;
 
 /**
  * This class implements the Listener interface and handles pre-login events.
- * It sets online mode, manages premium packet handlers, and defines event callbacks.
- * Key functionalities include setting premium packet handlers and defining event callbacks.
+ * It sets online mode, manages premium packet handlers, and defines event
+ * callbacks.
+ * Key functionalities include setting premium packet handlers and defining
+ * event callbacks.
  */
 public class PreLoginListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -37,6 +42,11 @@ public class PreLoginListener implements Listener {
 
     private void handleInitialHandler(PreLoginEvent event, InitialHandler initialHandler)
             throws NoSuchFieldException, IllegalAccessException {
+        if (AuthMePremiumPlugin.getInstance().getFloodgateHook()
+                .isFloodgatePlayer(event.getConnection().getUniqueId())) {
+            AuthMeBungeeHook.hookAuthMeBungee(event.getConnection().getName());
+            return;
+        }
         initialHandler.setOnlineMode(true);
         ChannelWrapper ch = getChannel(initialHandler);
         setPremiumPacketHandler(ch, initialHandler);
@@ -48,7 +58,8 @@ public class PreLoginListener implements Listener {
         return (ChannelWrapper) HandlerReflectionUtil.getFieldValue(initialHandler, "ch");
     }
 
-    private void setPremiumPacketHandler(ChannelWrapper ch, InitialHandler initialHandler) throws NoSuchFieldException, IllegalAccessException {
+    private void setPremiumPacketHandler(ChannelWrapper ch, InitialHandler initialHandler)
+            throws NoSuchFieldException, IllegalAccessException {
         if (ch != null) {
             ch.getHandle().pipeline().get(HandlerBoss.class).setHandler(new PremiumPacketHandler(initialHandler));
         }

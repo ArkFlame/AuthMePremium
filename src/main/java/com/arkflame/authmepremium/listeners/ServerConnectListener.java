@@ -19,7 +19,7 @@ public class ServerConnectListener implements Listener {
         // Player had no server before
         if (player.getServer() == null) {
             Boolean isPremium = AuthMePremiumPlugin.getDataProvider().getPremium(player.getName());
-            if (isPremium != null && isPremium) {
+            if ((isPremium != null && isPremium) || AuthMePremiumPlugin.getInstance().getFloodgateHook().isFloodgatePlayer(event.getPlayer().getUniqueId())) {
                 String targetServer = determineTargetServer();
                 if (targetServer != null) {
                     ServerInfo serverInfo = BungeeCord.getInstance().getServerInfo(targetServer);

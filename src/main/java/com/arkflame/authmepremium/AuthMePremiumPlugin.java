@@ -3,6 +3,7 @@ package com.arkflame.authmepremium;
 import com.arkflame.authmepremium.commands.AuthMePremiumCommand;
 import com.arkflame.authmepremium.commands.PremiumCommand;
 import com.arkflame.authmepremium.commands.PremiumUUIDCommand;
+import com.arkflame.authmepremium.hook.FloodgateHook;
 import com.arkflame.authmepremium.listeners.PostLoginListener;
 import com.arkflame.authmepremium.listeners.PreLoginListener;
 import com.arkflame.authmepremium.listeners.PremiumPostLoginListener;
@@ -47,11 +48,18 @@ public class AuthMePremiumPlugin extends Plugin {
         return AuthMePremiumPlugin.instance;
     }
 
+    private FloodgateHook floodgateHook;
+
+    public FloodgateHook getFloodgateHook() {
+        return floodgateHook;
+    }
+
     @Override
     public void onEnable() {
         // Set static instance
         setInstance(this);
 
+        floodgateHook = new FloodgateHook();
         ConfigManager configManager = new ConfigManager();
         setConfig(configManager.loadDefault(this, "config.yml"));
         Configuration messages = configManager.loadDefault(this, "messages.yml");
@@ -90,4 +98,8 @@ public class AuthMePremiumPlugin extends Plugin {
         getProxy().getPluginManager().unregisterListeners(this);
         getProxy().getPluginManager().unregisterCommands(this);
     }
+
+	public boolean isFloodgateEnabled() {
+        return getConfig().getBoolean("floodgate", false);
+	}
 }

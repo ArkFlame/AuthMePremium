@@ -23,6 +23,11 @@ target-server: "lobby"
 #
 always-offline: false
 
+# 
+# Automatically login Bedrock Edition players
+#
+floodgate: true
+
 #
 # Database information for MySQL
 #

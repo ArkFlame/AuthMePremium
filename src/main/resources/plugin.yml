@@ -4,3 +4,4 @@ author: ${author}
 main: ${mainClass}
 version: ${version}
 url: ${url}
+softDepends: [ floodgate, geyser ]
