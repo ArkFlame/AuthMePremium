@@ -59,7 +59,6 @@ public class AuthMePremiumPlugin extends Plugin {
         // Set static instance
         setInstance(this);
 
-        floodgateHook = new FloodgateHook();
         ConfigManager configManager = new ConfigManager();
         setConfig(configManager.loadDefault(this, "config.yml"));
         Configuration messages = configManager.loadDefault(this, "messages.yml");
@@ -79,6 +78,8 @@ public class AuthMePremiumPlugin extends Plugin {
             default:
                 throw new RuntimeException("You entered an invalid provider: " + provider);
         }
+        
+        floodgateHook = new FloodgateHook();
 
         PluginManager pluginManager = getProxy().getPluginManager();
 
