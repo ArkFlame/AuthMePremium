@@ -9,7 +9,7 @@
 
     <name>AuthMePremium</name>
     <description>Premium authentication for the AuthMe ecosystem</description>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <url>https://github.com/arkflame/BungeeCord-Boilerplate</url>
 
     <properties>
