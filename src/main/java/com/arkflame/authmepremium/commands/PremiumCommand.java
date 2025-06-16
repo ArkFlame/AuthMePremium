@@ -36,7 +36,11 @@ public class PremiumCommand extends Command {
 
         BungeeCord.getInstance().getScheduler().runAsync(AuthMePremiumPlugin.getInstance(), () -> {
             String name = sender.getName();
-            boolean newStatus = !dataProvider.getPremium(name);
+            Boolean isPremium = dataProvider.getPremium(name);
+            if (isPremium == null) {
+                isPremium = false;
+            }
+            boolean newStatus = !isPremium;
             dataProvider.setPremium(name, newStatus);
             sendMessage(sender, "premium_success", "%status%", String.valueOf(newStatus));
         });
