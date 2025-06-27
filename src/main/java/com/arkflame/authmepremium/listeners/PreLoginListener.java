@@ -29,6 +29,9 @@ import net.md_5.bungee.netty.HandlerBoss;
 public class PreLoginListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(PreLoginEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         if (event.getConnection() instanceof InitialHandler) {
             InitialHandler initialHandler = (InitialHandler) event.getConnection();
             try {
@@ -43,7 +46,7 @@ public class PreLoginListener implements Listener {
     private void handleInitialHandler(PreLoginEvent event, InitialHandler initialHandler)
             throws NoSuchFieldException, IllegalAccessException {
         if (AuthMePremiumPlugin.getInstance().getFloodgateHook()
-                .isFloodgatePlayer(event.getConnection().getUniqueId())) {
+                .isFloodgatePlayer(event.getConnection().getName(), event.getConnection().getUniqueId())) {
             AuthMeBungeeHook.hookAuthMeBungee(event.getConnection().getName());
             return;
         }
